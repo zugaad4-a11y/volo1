@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import useSWR from 'swr';
+import Link from 'next/link';
 import { supabaseClient } from '@/lib/supabase-client';
 import { compressKycImage } from '@/lib/image-compression';
 import { 
@@ -42,6 +43,7 @@ export default function CustomerServiceDetailPage() {
   const [selectedAddressId, setSelectedAddressId] = useState<string>('');
   const [customAddress, setCustomAddress] = useState('');
   const [customCoords, setCustomCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [detectingLocation, setDetectingLocation] = useState(false);
   const [notes, setNotes] = useState('');
   
   // Image attachments states
@@ -228,6 +230,54 @@ export default function CustomerServiceDetailPage() {
   const removeImage = (index: number) => {
     setImagePaths(prev => prev.filter((_, idx) => idx !== index));
     setImagePreviews(prev => prev.filter((_, idx) => idx !== index));
+  };
+
+  const handleDetectCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setErrorMsg('Geolocation is not supported by your browser.');
+      return;
+    }
+
+    setDetectingLocation(true);
+    setErrorMsg('');
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        setCustomCoords({ lat, lng });
+
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
+            {
+              headers: { 'User-Agent': 'VoloHomeServices/1.0 (contact@volo.com)' }
+            }
+          );
+          if (res.ok) {
+            const data = await res.json();
+            if (data.display_name) {
+              setCustomAddress(data.display_name);
+            } else {
+              setCustomAddress(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+            }
+          } else {
+            setCustomAddress(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+          }
+        } catch (err) {
+          console.error('Reverse geocoding failed:', err);
+          setCustomAddress(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+        } finally {
+          setDetectingLocation(false);
+        }
+      },
+      (error) => {
+        console.error('Geolocation error:', error);
+        setErrorMsg('Failed to detect your current position. Please enable location access.');
+        setDetectingLocation(false);
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
   };
 
   // Handle booking form submission
@@ -418,6 +468,15 @@ export default function CustomerServiceDetailPage() {
             </span>
 
             <div className="space-y-3">
+              <div className="flex justify-between items-center pb-1">
+                <label className="text-[9px] font-bold uppercase text-slate-450 tracking-wider font-mono">Select Delivery Location</label>
+                <Link
+                  href="https://volo2.netlify.app/customer/addresses"
+                  className="text-[9px] font-extrabold uppercase text-[#FF7A00] hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  Manage / Add Addresses ↗
+                </Link>
+              </div>
               <select
                 value={selectedAddressId}
                 onChange={(e) => setSelectedAddressId(e.target.value)}
@@ -433,7 +492,24 @@ export default function CustomerServiceDetailPage() {
 
               {selectedAddressId === 'CUSTOM' && (
                 <div className="space-y-1.5 animate-fadeIn">
-                  <label className="text-[9px] font-bold uppercase text-slate-450 tracking-wider font-mono">Street Address Details</label>
+                  <div className="flex justify-between items-center">
+                    <label className="text-[9px] font-bold uppercase text-slate-450 tracking-wider font-mono">Street Address Details</label>
+                    <button
+                      type="button"
+                      onClick={handleDetectCurrentLocation}
+                      disabled={detectingLocation}
+                      className="text-[9px] font-extrabold uppercase text-[#FF7A00] hover:underline flex items-center gap-1 cursor-pointer select-none disabled:opacity-50"
+                    >
+                      {detectingLocation ? (
+                        <>
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                          Detecting...
+                        </>
+                      ) : (
+                        '📍 Use Current Location'
+                      )}
+                    </button>
+                  </div>
                   <textarea
                     rows={2}
                     value={customAddress}

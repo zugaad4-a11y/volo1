@@ -23,6 +23,10 @@ interface AddressItem {
 export default function CustomerAddressesPage() {
   const { data, error, isLoading } = useSWR('/api/customer/addresses', fetcher);
 
+  useEffect(() => {
+    window.location.href = 'https://volo2.netlify.app/customer/addresses';
+  }, []);
+
   const [saving, setSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');

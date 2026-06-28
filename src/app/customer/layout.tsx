@@ -22,7 +22,7 @@ const navItems: NavItem[] = [
   { name: 'Services', href: '/customer/services', icon: Sparkles },
   { name: 'My Bookings', href: '/customer/bookings', icon: Briefcase },
   { name: 'Volo Wallet', href: '/customer/wallet', icon: Wallet },
-  { name: 'Addresses', href: '/customer/addresses', icon: MapPin },
+  { name: 'Addresses', href: 'https://volo2.netlify.app/customer/addresses', icon: MapPin },
   { name: 'Profile', href: '/customer/profile', icon: User },
   { name: 'History', href: '/customer/booking-history', icon: History },
   { name: 'Invoices', href: '/customer/invoices', icon: CreditCard },
@@ -253,7 +253,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
                     <Link href="/customer/bookings" onClick={() => setProfileMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-slate-400 hover:bg-white/[0.03] hover:text-white transition-colors">
                       <Briefcase className="h-4 w-4 text-slate-400" /> Manage Bookings
                     </Link>
-                    <Link href="/customer/addresses" onClick={() => setProfileMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-slate-400 hover:bg-white/[0.03] hover:text-white transition-colors">
+                    <Link href="https://volo2.netlify.app/customer/addresses" onClick={() => setProfileMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-slate-400 hover:bg-white/[0.03] hover:text-white transition-colors">
                       <MapPin className="h-4 w-4 text-slate-400" /> Addresses
                     </Link>
                     <Link href="/customer/wallet" onClick={() => setProfileMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-slate-400 hover:bg-white/[0.03] hover:text-white transition-colors">
