@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>dummy_api_key_for_local_development_only</string>
+	<key>PROJECT_ID</key>
+	<string>volohome-16448</string>
+	<key>BUNDLE_ID</key>
+	<string>com.volohome.app</string>
+</dict>
+</plist>

@@ -1,0 +1,78 @@
+[2026-06-19T11:44:04.340Z] {
+  "message": "GET request received"
+}
+[2026-06-19T11:44:04.343Z] {
+  "message": "Parsed params",
+  "id": "e4ac8f59-ca09-49c7-9ed0-9e3a70c8c04c"
+}
+[2026-06-19T11:44:04.643Z] {
+  "message": "Supabase query result",
+  "item": {
+    "id": "e4ac8f59-ca09-49c7-9ed0-9e3a70c8c04c",
+    "category_id": "ea85b1c7-1182-47eb-880c-003d1b118784",
+    "name": "electrics switches",
+    "description": ",,fdmalkdfa",
+    "base_price": 1000,
+    "estimated_mins": 60,
+    "icon_url": null,
+    "is_active": true,
+    "created_at": "2026-06-15T06:57:37.375059+00:00",
+    "service_categories": {
+      "name": "electrican"
+    }
+  },
+  "itemErr": null
+}
+[2026-06-19T11:44:04.644Z] {
+  "message": "Check flags",
+  "categoryName": "electrican",
+  "isAllowed": true,
+  "will404": false
+}
+[2026-06-19T11:48:39.910Z] {
+  "message": "GET request received"
+}
+[2026-06-19T11:48:39.911Z] {
+  "message": "Parsed params",
+  "id": "e4ac8f59-ca09-49c7-9ed0-9e3a70c8c04c"
+}
+[2026-06-19T11:48:40.171Z] {
+  "message": "Supabase query result",
+  "item": {
+    "id": "e4ac8f59-ca09-49c7-9ed0-9e3a70c8c04c",
+    "category_id": "ea85b1c7-1182-47eb-880c-003d1b118784",
+    "name": "electrics switches",
+    "description": ",,fdmalkdfa",
+    "base_price": 1000,
+    "estimated_mins": 60,
+    "icon_url": null,
+    "is_active": true,
+    "created_at": "2026-06-15T06:57:37.375059+00:00",
+    "service_categories": {
+      "name": "electrican"
+    }
+  },
+  "itemErr": null
+}
+[2026-06-19T11:48:40.171Z] {
+  "message": "Check flags",
+  "categoryName": "electrican",
+  "isAllowed": true,
+  "will404": false
+}
+[2026-06-19T11:48:56.947Z] {
+  "message": "GET request received"
+}
+[2026-06-19T11:48:56.948Z] {
+  "message": "Catch block hit",
+  "errorMessage": "UNAUTHORIZED",
+  "errorStatus": 401
+}
+[2026-06-19T11:49:20.981Z] {
+  "message": "GET request received"
+}
+[2026-06-19T11:49:20.982Z] {
+  "message": "Catch block hit",
+  "errorMessage": "FORBIDDEN",
+  "errorStatus": 403
+}
