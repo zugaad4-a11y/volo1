@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import useSWR, { mutate } from 'swr';
 import { 
   MapPin, Plus, Trash2, Home, Briefcase, HelpCircle, 
@@ -35,7 +35,27 @@ export default function CustomerAddressesPage() {
   const [address, setAddress] = useState('');
   const [latitude, setLatitude] = useState('12.9716');
   const [longitude, setLongitude] = useState('77.5946');
+  const [deviceCoords, setDeviceCoords] = useState<{ lat: string; lng: string } | null>(null);
   const [isDefault, setIsDefault] = useState(false);
+
+  // Initialize coordinates dynamically based on current user device position
+  useEffect(() => {
+    if (typeof window !== 'undefined' && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude.toFixed(6);
+          const lng = position.coords.longitude.toFixed(6);
+          setDeviceCoords({ lat, lng });
+          setLatitude(lat);
+          setLongitude(lng);
+        },
+        (error) => {
+          console.error("Device geolocation query failed on mount:", error);
+        },
+        { enableHighAccuracy: false, timeout: 5000 }
+      );
+    }
+  }, []);
 
   // Autocomplete states
   const [suggestions, setSuggestions] = useState<any[]>([]);
@@ -148,8 +168,8 @@ export default function CustomerAddressesPage() {
     setEditingId(null);
     setLabel('HOME');
     setAddress('');
-    setLatitude('12.9716');
-    setLongitude('77.5946');
+    setLatitude(deviceCoords?.lat || '12.9716');
+    setLongitude(deviceCoords?.lng || '77.5946');
     setIsDefault(false);
     setSuggestions([]);
     setShowSuggestions(false);

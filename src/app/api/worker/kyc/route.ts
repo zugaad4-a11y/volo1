@@ -74,6 +74,19 @@ export async function GET(request: Request) {
 
     if (workerErr) throw workerErr;
 
+    // Fetch skills from worker_profiles
+    const { data: profile } = await supabaseAdmin
+      .from('worker_profiles')
+      .select('skills')
+      .eq('worker_id', workerId)
+      .maybeSingle();
+
+    // Fetch active categories
+    const { data: categories } = await supabaseAdmin
+      .from('service_categories')
+      .select('id, name')
+      .eq('is_active', true);
+
     return NextResponse.json({
       success: true,
       documents: docsWithUrls,
@@ -86,6 +99,8 @@ export async function GET(request: Request) {
         remarks: null,
         submitted_at: null
       },
+      skills: profile?.skills || [],
+      categories: categories || [],
       bankDetails: workerData ? {
         ...workerData,
         full_name: userDetails?.full_name || ''
@@ -127,7 +142,7 @@ export async function POST(request: Request) {
 
     // 1. Handle Bank & Personal Details Upload if sent
     if (bankDetails) {
-      const { bank_account_name, bank_account_number, bank_ifsc, full_name, dob } = bankDetails;
+      const { bank_account_name, bank_account_number, bank_ifsc, full_name, dob, skills } = bankDetails;
 
       const updateData: any = {
         bank_account_name,
@@ -197,6 +212,40 @@ export async function POST(request: Request) {
           .update({ full_name })
           .eq('id', workerId);
         if (updateUserErr) throw updateUserErr;
+      }
+
+      // Save/Update skills in worker_profiles
+      if (Array.isArray(skills)) {
+        const { data: existingProfile } = await supabaseAdmin
+          .from('worker_profiles')
+          .select('id')
+          .eq('worker_id', workerId)
+          .maybeSingle();
+
+        if (existingProfile) {
+          const { error: profileUpdateErr } = await supabaseAdmin
+            .from('worker_profiles')
+            .update({ skills, updated_at: new Date().toISOString() })
+            .eq('worker_id', workerId);
+          if (profileUpdateErr) throw profileUpdateErr;
+        } else {
+          const { error: profileInsertErr } = await supabaseAdmin
+            .from('worker_profiles')
+            .insert({
+              worker_id: workerId,
+              skills,
+              city: 'Bangalore',
+              state: 'Karnataka'
+            });
+          if (profileInsertErr) throw profileInsertErr;
+        }
+
+        // Explicitly trigger category sync function to verify consistency immediately
+        try {
+          await supabaseAdmin.rpc('sync_worker_categories_by_skills', { p_worker_id: workerId });
+        } catch (err) {
+          console.error('[KYC API] Failed to invoke sync_worker_categories_by_skills:', err);
+        }
       }
 
       return NextResponse.json({ success: true, message: 'Bank and personal details updated.' });

@@ -166,8 +166,16 @@ export default function AdminOperationsDashboard() {
     const onJob: WorkerLocation[] = data.onJobWorkers || [];
     const allWorkers = [...online, ...enRoute, ...onJob];
 
-    const centerLat = 12.9716; // default Bangalore
-    const centerLng = 77.5946;
+    let centerLat = 12.9716; // fallback
+    let centerLng = 77.5946;
+
+    if (bookings.length > 0) {
+      centerLat = bookings[0].lat || centerLat;
+      centerLng = bookings[0].lng || centerLng;
+    } else if (allWorkers.length > 0) {
+      centerLat = allWorkers[0].worker_live_locations?.latitude || centerLat;
+      centerLng = allWorkers[0].worker_live_locations?.longitude || centerLng;
+    }
 
     // Google Maps Render Loop
     if (mapsLoaded && mapContainerRef.current && (window as any).google?.maps) {

@@ -47,6 +47,8 @@ export default function WorkerKycPage() {
   const [bankIfsc, setBankIfsc] = useState('');
   const [bankSaving, setBankSaving] = useState(false);
   const [bankSavedMsg, setBankSavedMsg] = useState('');
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
 
   // Upload progress indicators
   const [uploadingDoc, setUploadingDoc] = useState<string | null>(null);
@@ -59,6 +61,8 @@ export default function WorkerKycPage() {
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const [cameraError, setCameraError] = useState('');
   const [cameraLoading, setCameraLoading] = useState(false);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [capturedBlob, setCapturedBlob] = useState<Blob | null>(null);
 
   // Cleanup camera stream on unmount
   useEffect(() => {
@@ -83,6 +87,8 @@ export default function WorkerKycPage() {
       const data = await res.json();
       setDocuments(data.documents || []);
       setKycState(data.kycState);
+      setCategories(data.categories || []);
+      setSelectedSkills(data.skills || []);
       
       if (data.bankDetails) {
         setBankName(data.bankDetails.bank_account_name || '');
@@ -233,6 +239,8 @@ export default function WorkerKycPage() {
     }
     setIsCameraOpen(false);
     setCameraError('');
+    setCapturedImage(null);
+    setCapturedBlob(null);
   };
 
   const captureSelfie = () => {
@@ -255,17 +263,27 @@ export default function WorkerKycPage() {
 
     context.drawImage(video, 0, 0, width, height);
 
-    canvas.toBlob(async (blob) => {
-      if (!blob) {
-        setErrorMsg('Failed to process snapshot.');
-        return;
-      }
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+    setCapturedImage(dataUrl);
 
-      const selfieFile = new File([blob], 'selfie.jpg', { type: 'image/jpeg' });
-      stopCamera();
-      
-      await executeDocUpload(selfieFile, 'SELFIE_VERIFICATION');
+    canvas.toBlob((blob) => {
+      if (blob) {
+        setCapturedBlob(blob);
+      }
     }, 'image/jpeg', 0.95);
+  };
+
+  const uploadSelfie = async () => {
+    if (!capturedBlob) return;
+
+    const selfieFile = new File([capturedBlob], 'selfie.jpg', { type: 'image/jpeg' });
+    
+    // Clear preview states and stop camera
+    setCapturedImage(null);
+    setCapturedBlob(null);
+    stopCamera();
+    
+    await executeDocUpload(selfieFile, 'SELFIE_VERIFICATION');
   };
 
   // Save bank and personal settings
@@ -285,7 +303,8 @@ export default function WorkerKycPage() {
             bank_account_number: bankAccount,
             bank_ifsc: bankIfsc,
             full_name: fullName,
-            dob: dob
+            dob: dob,
+            skills: selectedSkills
           }
         })
       });
@@ -546,6 +565,65 @@ export default function WorkerKycPage() {
             />
           </div>
 
+          {/* Services Provided */}
+          <div className="space-y-2 md:col-span-2 border-t border-white/[0.04] pt-3">
+            <label className="text-[9px] uppercase font-black text-slate-500 tracking-widest block">
+              Services You Provide
+            </label>
+            <p className="text-[10px] text-slate-500 font-semibold mb-2">
+              Select the service category/categories you are skilled in. These will be automatically configured upon admin approval.
+            </p>
+            {categories.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+                {categories.map((cat) => {
+                  let skillKeyword = cat.name;
+                  if (cat.name.toLowerCase().includes('elect')) skillKeyword = 'electrician';
+                  else if (cat.name.toLowerCase().includes('plumb')) skillKeyword = 'plumber';
+
+                  const isChecked = selectedSkills.includes(skillKeyword) || selectedSkills.includes(cat.name);
+
+                  const handleSkillToggle = (checked: boolean) => {
+                    if (checked) {
+                      setSelectedSkills((prev) => Array.from(new Set([...prev, skillKeyword, cat.name])));
+                    } else {
+                      setSelectedSkills((prev) =>
+                        prev.filter((s) => s !== skillKeyword && s !== cat.name)
+                      );
+                    }
+                  };
+
+                  return (
+                    <label
+                      key={cat.id}
+                      className={`flex items-center gap-3 p-3.5 rounded-2xl border transition-all cursor-pointer select-none ${
+                        isChecked
+                          ? 'bg-[#FF7A00]/5 border-[#FF7A00] text-white shadow-md shadow-orange-500/5'
+                          : 'bg-[#070B14] border-white/[0.08] hover:border-[#FF7A00]/30 text-slate-400'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={(e) => handleSkillToggle(e.target.checked)}
+                        className="h-4.5 w-4.5 rounded border-white/[0.08] bg-[#070B14] text-[#FF7A00] focus:ring-0 focus:ring-offset-0 cursor-pointer accent-[#FF7A00]"
+                      />
+                      <div className="flex flex-col">
+                        <span className="text-xs font-bold leading-none">{cat.name}</span>
+                        <span className="text-[9px] text-slate-500 font-semibold mt-1">
+                          Apply as {skillKeyword === 'electrician' ? 'Electrician' : skillKeyword === 'plumber' ? 'Plumber' : 'Technician'}
+                        </span>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="p-3 bg-slate-900/50 border border-white/[0.04] text-slate-400 rounded-xl text-center text-xs font-semibold">
+                No active service categories found.
+              </div>
+            )}
+          </div>
+
           <div className="space-y-1">
             <label className="text-[9px] uppercase font-black text-slate-500 tracking-widest">Account Holder Name</label>
             <input
@@ -647,6 +725,12 @@ export default function WorkerKycPage() {
                     Select Photo from Files
                   </button>
                 </div>
+              ) : capturedImage ? (
+                <img
+                  src={capturedImage}
+                  alt="Captured Selfie Preview"
+                  className="w-full h-full object-cover"
+                />
               ) : (
                 <>
                   <video
@@ -667,23 +751,44 @@ export default function WorkerKycPage() {
 
             {/* Action Buttons */}
             {!cameraError && !cameraLoading && (
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={captureSelfie}
-                  disabled={!cameraStream}
-                  className="flex-1 py-3 bg-[#FF7A00] hover:bg-[#FF9E43] disabled:opacity-50 text-white rounded-2xl text-xs font-black uppercase tracking-wider transition-all select-none cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20"
-                >
-                  <Camera className="h-4 w-4" />
-                  Capture & Upload Selfie
-                </button>
-                <button
-                  type="button"
-                  onClick={stopCamera}
-                  className="px-5 py-3 bg-[#070B14] hover:bg-[#070B14]/80 border border-white/[0.08] text-slate-300 rounded-2xl text-xs font-bold transition-colors cursor-pointer"
-                >
-                  Cancel
-                </button>
+              <div className="flex gap-3 w-full">
+                {capturedImage ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => { setCapturedImage(null); setCapturedBlob(null); }}
+                      className="flex-1 py-3 bg-[#070B14] hover:bg-[#070B14]/80 border border-white/[0.08] text-slate-300 rounded-2xl text-xs font-bold transition-colors cursor-pointer text-center uppercase tracking-wider font-extrabold"
+                    >
+                      🔄 Retake
+                    </button>
+                    <button
+                      type="button"
+                      onClick={uploadSelfie}
+                      className="flex-1 py-3 bg-[#FF7A00] hover:bg-[#FF9E43] text-white rounded-2xl text-xs font-black uppercase tracking-wider transition-all select-none cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20"
+                    >
+                      Upload Selfie
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={captureSelfie}
+                      disabled={!cameraStream}
+                      className="flex-1 py-3 bg-[#FF7A00] hover:bg-[#FF9E43] disabled:opacity-50 text-white rounded-2xl text-xs font-black uppercase tracking-wider transition-all select-none cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20"
+                    >
+                      <Camera className="h-4 w-4" />
+                      Capture Selfie
+                    </button>
+                    <button
+                      type="button"
+                      onClick={stopCamera}
+                      className="px-5 py-3 bg-[#070B14] hover:bg-[#070B14]/80 border border-white/[0.08] text-slate-300 rounded-2xl text-xs font-bold transition-colors cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                  </>
+                )}
               </div>
             )}
 

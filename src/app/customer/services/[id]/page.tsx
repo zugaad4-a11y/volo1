@@ -41,6 +41,7 @@ export default function CustomerServiceDetailPage() {
   const [scheduledAt, setScheduledAt] = useState('');
   const [selectedAddressId, setSelectedAddressId] = useState<string>('');
   const [customAddress, setCustomAddress] = useState('');
+  const [customCoords, setCustomCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [notes, setNotes] = useState('');
   
   // Image attachments states
@@ -73,6 +74,24 @@ export default function CustomerServiceDetailPage() {
       }
     }
   }, [addrData]);
+
+  // Query browser location if custom address option is active
+  useEffect(() => {
+    if (selectedAddressId === 'CUSTOM' && typeof window !== 'undefined' && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setCustomCoords({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.error("Custom address geolocation fetch failed:", error);
+        },
+        { enableHighAccuracy: true, timeout: 6000 }
+      );
+    }
+  }, [selectedAddressId]);
 
   if (serviceLoading || addrLoading || walletLoading) {
     return (
@@ -227,6 +246,29 @@ export default function CustomerServiceDetailPage() {
         return;
       }
       finalAddress = customAddress;
+      if (customCoords) {
+        lat = customCoords.lat;
+        lng = customCoords.lng;
+      } else {
+        // Attempt to fetch geolocation dynamically
+        if (typeof window !== 'undefined' && navigator.geolocation) {
+          setErrorMsg('Retrieving location coordinates. Please allow GPS access.');
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              setCustomCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+              setErrorMsg('');
+            },
+            (err) => {
+              console.error(err);
+              setErrorMsg('Unable to retrieve location coordinates. Select a saved address or allow location permissions.');
+            }
+          );
+          return;
+        } else {
+          setErrorMsg('Location coordinates are not supported by your browser. Please select a saved address.');
+          return;
+        }
+      }
     } else {
       const selected = addrData?.addresses?.find((a: AddressItem) => a.id === selectedAddressId);
       if (!selected) {
@@ -400,8 +442,8 @@ export default function CustomerServiceDetailPage() {
                     placeholder="Street details, door number, landmarks..."
                     required
                   />
-                  <span className="text-[8px] text-slate-500 font-semibold font-mono leading-relaxed block pl-1">
-                    * Note: custom location coordinates default to Central Bangalore dispatcher bounds.
+                  <span className="text-[8px] text-[#FF7A00] font-semibold font-mono leading-relaxed block pl-1">
+                    * Note: custom location uses your device's active GPS coordinates. Please allow location access.
                   </span>
                 </div>
               )}
