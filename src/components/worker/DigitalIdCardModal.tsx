@@ -21,6 +21,7 @@ interface DigitalIdCardModalProps {
  
 export default function DigitalIdCardModal({ isOpen, onClose, worker, photoUrl }: DigitalIdCardModalProps) {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
+  const [activeSide, setActiveSide] = useState<'front' | 'back'>('front');
  
   useEffect(() => {
     if (isOpen && worker) {
@@ -81,12 +82,43 @@ export default function DigitalIdCardModal({ isOpen, onClose, worker, photoUrl }
             border: none !important;
             background: transparent !important;
           }
+          #printable-id-card-area > div {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+          }
           .no-print {
             display: none !important;
           }
         }
       ` }} />
       
+      {/* Mobile Toggle Carousel Tabs (Pills) */}
+      <div className="flex md:hidden bg-slate-900/80 border border-white/[0.06] rounded-full p-1 mb-4 z-20 no-print select-none">
+        <button
+          type="button"
+          onClick={() => setActiveSide('front')}
+          className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
+            activeSide === 'front'
+              ? 'bg-[#FF8A00] text-white shadow-md'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          Front Side
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveSide('back')}
+          className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
+            activeSide === 'back'
+              ? 'bg-[#FF8A00] text-white shadow-md'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          Back Side
+        </button>
+      </div>
+
       {/* Cards Area Wrapper */}
       <div 
         id="printable-id-card-area" 
@@ -94,7 +126,7 @@ export default function DigitalIdCardModal({ isOpen, onClose, worker, photoUrl }
       >
         
         {/* ==================== FRONT SIDE BADGE ==================== */}
-        <div className="flex flex-col items-center w-full max-w-[320px]">
+        <div className={`w-full max-w-[320px] md:flex md:flex-col md:items-center ${activeSide === 'front' ? 'flex flex-col items-center' : 'hidden md:flex'}`}>
           
           {/* Lanyard & Strap Visuals */}
           <div className="flex flex-col items-center mb-[-24px] relative z-20 no-print">
@@ -190,7 +222,7 @@ export default function DigitalIdCardModal({ isOpen, onClose, worker, photoUrl }
         </div>
  
         {/* ==================== BACK SIDE BADGE ==================== */}
-        <div className="flex flex-col items-center w-full max-w-[320px]">
+        <div className={`w-full max-w-[320px] md:flex md:flex-col md:items-center ${activeSide === 'back' ? 'flex flex-col items-center' : 'hidden md:flex'}`}>
           
           {/* Lanyard & Strap Visuals */}
           <div className="flex flex-col items-center mb-[-24px] relative z-20 no-print">
