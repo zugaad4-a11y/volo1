@@ -436,12 +436,12 @@ export default function WorkerLayout({ children }: { children: React.ReactNode }
                   </Link>
 
                   <Link 
-                    href="/worker/settings" 
+                    href="/worker/profile" 
                     onClick={() => setProfileDropdownOpen(false)}
                     className="flex items-center gap-3 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-[#070B14] hover:text-[#FF7A00] transition-colors"
                   >
-                    <Settings className="h-4 w-4" />
-                    Settings
+                    <User className="h-4 w-4" />
+                    My Profile
                   </Link>
 
                   <Link 
