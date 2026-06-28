@@ -864,6 +864,9 @@ export default function CustomerDashboardPage() {
             <p className="text-xs text-slate-405 leading-relaxed font-semibold">
               Are you sure you want to cancel your upcoming service booking? This action is reversible.
             </p>
+            <div className="bg-red-500/5 border border-red-500/10 rounded-xl p-3 text-[10px] text-red-400 font-bold leading-normal font-mono select-none">
+              ⚠️ Prior Notice: You can only cancel this service within 2 minutes of booking.
+            </div>
             <div className="flex gap-2.5 pt-2">
               <button
                 type="button"
@@ -900,6 +903,9 @@ export default function CustomerDashboardPage() {
                 onChange={(e) => setRescheduleDate(e.target.value)}
                 className="w-full bg-[#070B14] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#FF7A00]"
               />
+              <span className="text-[8px] text-[#FF7A00] font-semibold font-mono leading-relaxed block pl-1">
+                * Reschedule Notice: Bookings can only be rescheduled or cancelled within 2 minutes of the initial booking creation.
+              </span>
             </div>
             <div className="flex gap-2.5 pt-2">
               <button

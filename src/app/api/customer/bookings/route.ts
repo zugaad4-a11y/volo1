@@ -315,24 +315,11 @@ export async function POST(request: Request) {
       body: `Your service request for ${item.name} is successfully registered.`
     });
 
-    if (booking.booking_type === 'INSTANT') {
-      startAssignment(booking.id).catch(err => {
-        console.error('Assignment start failed:', err);
-      });
-    } else {
-      // SCHEDULED: write queue entry with trigger time (15 mins prior)
-      const triggerAt = new Date(booking.scheduled_at);
-      triggerAt.setMinutes(triggerAt.getMinutes() - 15);
-
-      await supabaseAdmin.from('assignment_queue').insert({
-        booking_id: booking.id,
-        status: 'QUEUED',
-        current_group: 1,
-        group_workers: [],
-        all_notified_workers: [],
-        group_expires_at: triggerAt.toISOString()
-      });
-    }
+    // Trigger auto-assignment immediately for both Instant and Scheduled bookings
+    // so that the customer gets matched and confirmed with a worker ahead of time.
+    startAssignment(booking.id).catch(err => {
+      console.error('Assignment start failed:', err);
+    });
 
     return NextResponse.json({
       success: true,

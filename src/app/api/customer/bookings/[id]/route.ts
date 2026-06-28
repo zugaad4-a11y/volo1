@@ -84,7 +84,7 @@ export async function PATCH(
     // Verify ownership
     const { data: booking, error: fetchErr } = await supabaseAdmin
       .from('bookings')
-      .select('customer_id, status')
+      .select('customer_id, status, created_at')
       .eq('id', id)
       .single();
 
@@ -100,6 +100,18 @@ export async function PATCH(
       if (booking.status === 'COMPLETED' || booking.status === 'CANCELLED') {
         return NextResponse.json({ error: 'Cannot cancel completed or already cancelled bookings.' }, { status: 400 });
       }
+
+      // 2-minute cancellation buffer time check
+      const createdAtTime = new Date(booking.created_at).getTime();
+      const elapsedMs = Date.now() - createdAtTime;
+      const bufferMs = 2 * 60 * 1000;
+
+      if (elapsedMs > bufferMs) {
+        return NextResponse.json({
+          error: 'Cancellation buffer expired. Bookings can only be cancelled within 2 minutes of placement.'
+        }, { status: 400 });
+      }
+
       updates.status = 'CANCELLED';
     }
     if (body.scheduled_at) {

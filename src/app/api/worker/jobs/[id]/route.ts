@@ -38,6 +38,7 @@ export async function GET(
       scheduled_at: booking.scheduled_at,
       started_at: booking.started_at,
       completed_at: booking.completed_at,
+      created_at: booking.created_at,
       total_amount: Number(booking.total_amount),
       notes: booking.notes,
       estimated_earnings: Number((booking.total_amount * 0.85).toFixed(2)),

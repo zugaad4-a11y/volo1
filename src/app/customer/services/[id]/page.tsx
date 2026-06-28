@@ -452,10 +452,13 @@ export default function CustomerServiceDetailPage() {
                   className="w-full bg-[#070B14] border border-white/[0.08] focus:border-[#FF7A00]/50 rounded-xl px-4 py-2.5 text-xs text-white font-semibold outline-none transition-all focus:ring-4 focus:ring-orange-500/5"
                   required
                 />
+                <span className="text-[8px] text-[#FF7A00] font-semibold font-mono leading-relaxed block pl-1">
+                  * Notice: Scheduled bookings are assigned immediately to guarantee a technician ahead of time. Cancellation/rescheduling is only available within 2 minutes of booking.
+                </span>
               </div>
             ) : (
               <p className="text-[10px] text-slate-450 leading-relaxed font-semibold italic pl-1">
-                * Instant service dispatches the nearest available certified professional immediately. Average arrival: 30-45 mins.
+                * Instant service dispatches the nearest available certified professional immediately. Average arrival: 30-45 mins. Cancellation is only available within 2 minutes of booking.
               </p>
             )}
           </div>

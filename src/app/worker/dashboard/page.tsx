@@ -931,14 +931,42 @@ export default function WorkerDashboardPage() {
 
                   {/* Flow Buttons */}
                   {dashboardData.activeJob.status === 'WORKER_ACCEPTED' && (
-                    <button
-                      type="button"
-                      onClick={() => handleUpdateActiveJobStatus('ON_THE_WAY')}
-                      className="w-full py-4 px-6 rounded-2xl bg-[#FF7A00] hover:bg-[#FF9E43] text-white text-xs font-black uppercase tracking-widest shadow-lg shadow-orange-500/20 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer"
-                    >
-                      <Navigation className="h-4.5 w-4.5 animate-pulse" />
-                      Start Journey (En Route)
-                    </button>
+                    <div className="space-y-3">
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateActiveJobStatus('ON_THE_WAY')}
+                        className="w-full py-4 px-6 rounded-2xl bg-[#FF7A00] hover:bg-[#FF9E43] text-white text-xs font-black uppercase tracking-widest shadow-lg shadow-orange-500/20 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      >
+                        <Navigation className="h-4.5 w-4.5 animate-pulse" />
+                        Start Journey (En Route)
+                      </button>
+                      <div className="flex flex-col gap-2 border border-white/[0.04] p-3.5 rounded-2xl bg-[#070B14]/40 select-none">
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            if (window.confirm("Are you sure you want to decline/reject this assigned job?")) {
+                              try {
+                                setJobUpdateError('');
+                                const res = await fetch(`/api/worker/jobs/${dashboardData.activeJob.id}/reject`, {
+                                  method: 'POST'
+                                });
+                                const data = await res.json();
+                                if (!res.ok) throw new Error(data.error || 'Failed to reject job.');
+                                mutate('/api/worker/dashboard');
+                              } catch (err: any) {
+                                setJobUpdateError(err.message || 'Error rejecting job.');
+                              }
+                            }
+                          }}
+                          className="w-full py-2 bg-red-500/10 hover:bg-red-500/15 border border-red-500/20 hover:border-red-500/30 text-red-400 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer select-none text-center"
+                        >
+                          Decline Assigned Job
+                        </button>
+                        <span className="text-[8px] text-red-400/80 font-mono font-bold block text-center leading-normal">
+                          ⚠️ Prior Notice: You can only decline this job within 5 minutes of assignment.
+                        </span>
+                      </div>
+                    </div>
                   )}
 
                   {dashboardData.activeJob.status === 'ON_THE_WAY' && (

@@ -154,15 +154,43 @@ export default function WorkerJobDetailPage() {
     switch (job.status) {
       case 'WORKER_ACCEPTED':
         return (
-          <button
-            type="button"
-            onClick={() => handleUpdateStatus('ON_THE_WAY')}
-            disabled={updating}
-            className="w-full flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-500 text-white py-3.5 px-6 rounded-2xl text-xs font-extrabold uppercase tracking-wider transition-all select-none cursor-pointer"
-          >
-            {updating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-            Start Journey (On the way)
-          </button>
+          <div className="space-y-3">
+            <button
+              type="button"
+              onClick={() => handleUpdateStatus('ON_THE_WAY')}
+              disabled={updating}
+              className="w-full flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-500 text-white py-3.5 px-6 rounded-2xl text-xs font-extrabold uppercase tracking-wider transition-all select-none cursor-pointer"
+            >
+              {updating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+              Start Journey (On the way)
+            </button>
+            <div className="flex flex-col gap-2 border border-white/[0.04] p-3.5 rounded-2xl bg-slate-950/40 select-none">
+              <button
+                type="button"
+                onClick={async () => {
+                  if (window.confirm("Are you sure you want to decline/reject this assigned job?")) {
+                    try {
+                      setErrorMsg('');
+                      const res = await fetch(`/api/worker/jobs/${jobId}/reject`, {
+                        method: 'POST'
+                      });
+                      const data = await res.json();
+                      if (!res.ok) throw new Error(data.error || 'Failed to reject job.');
+                      router.push('/worker/dashboard');
+                    } catch (err: any) {
+                      setErrorMsg(err.message || 'Error rejecting job.');
+                    }
+                  }
+                }}
+                className="w-full py-2 bg-red-500/10 hover:bg-red-500/15 border border-red-500/25 hover:border-red-500/35 text-red-400 text-[10px] font-extrabold uppercase tracking-wider rounded-xl transition-all cursor-pointer select-none text-center"
+              >
+                Decline Assigned Job
+              </button>
+              <span className="text-[8px] text-red-400/80 font-mono font-bold block text-center leading-normal">
+                ⚠️ Prior Notice: You can only decline this job within 5 minutes of assignment.
+              </span>
+            </div>
+          </div>
         );
       case 'ON_THE_WAY':
         return (
@@ -379,12 +407,21 @@ export default function WorkerJobDetailPage() {
             <div className="flex items-center gap-2.5 border-t border-slate-850/60 pt-3">
               <Clock className="h-4 w-4 text-rose-500 shrink-0" />
               <div>
-                <span className="text-slate-500 text-[10px] uppercase font-bold tracking-wider">Scheduled Timing</span>
+                <span className="text-slate-500 text-[10px] uppercase font-bold tracking-wider">
+                  {job.scheduled_at ? 'Scheduled Timing' : 'Instant Booking'}
+                </span>
                 <p className="text-slate-300 font-semibold mt-0.5">
-                  {new Date(job.scheduled_at).toLocaleString(undefined, { 
-                    weekday: 'short', month: 'short', day: 'numeric', 
-                    hour: '2-digit', minute: '2-digit' 
-                  })}
+                  {job.scheduled_at ? (
+                    new Date(job.scheduled_at).toLocaleString(undefined, { 
+                      weekday: 'short', month: 'short', day: 'numeric', 
+                      hour: '2-digit', minute: '2-digit' 
+                    })
+                  ) : (
+                    `Immediate Dispatch (Requested: ${new Date(job.created_at || Date.now()).toLocaleString(undefined, { 
+                      weekday: 'short', month: 'short', day: 'numeric', 
+                      hour: '2-digit', minute: '2-digit' 
+                    })})`
+                  )}
                 </p>
               </div>
             </div>

@@ -28,6 +28,17 @@ export async function POST(
         return NextResponse.json({ error: 'Access denied.' }, { status: 403 });
       }
 
+      // Check 5-minute assignment buffer for worker rejection
+      const assignedAtTime = new Date(booking.updated_at).getTime();
+      const elapsedMs = Date.now() - assignedAtTime;
+      const bufferMs = 5 * 60 * 1000;
+
+      if (elapsedMs > bufferMs) {
+        return NextResponse.json({
+          error: 'Rejection buffer expired. Assigned jobs can only be declined within 5 minutes of assignment.'
+        }, { status: 400 });
+      }
+
       // Revert manual assignment
       const { error: bookingUpdateErr } = await supabaseAdmin
         .from('bookings')
