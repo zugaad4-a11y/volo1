@@ -174,9 +174,9 @@ export default function AdminTopbar({
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-30 h-16 bg-[#111827]/80 backdrop-blur-xl border-b border-[#1F2937] px-6 flex items-center justify-between shadow-lg shadow-black/35 select-none no-print">
+      <header className="fixed top-0 left-0 right-0 z-30 h-16 bg-[#111827]/80 backdrop-blur-xl border-b border-[#1F2937] px-3 sm:px-6 flex items-center justify-between shadow-lg shadow-black/35 select-none no-print">
         {/* Brand Logo & Collapse Trigger toggle */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-1.5 sm:gap-4">
           {/* Hamburger Menu Toggle for Mobile/Tablet */}
           <button
             type="button"
@@ -187,15 +187,15 @@ export default function AdminTopbar({
             <Menu className="h-5 w-5" />
           </button>
 
-          <Link href="/admin/dashboard" className="flex items-center gap-3 hover:opacity-95 transition-opacity">
+          <Link href="/admin/dashboard" className="flex items-center gap-2 sm:gap-3 hover:opacity-95 transition-opacity">
             <img 
               src="/images/logo.jpeg" 
               alt="VOLO Logo" 
               className="h-9 w-9 rounded-xl object-contain border border-white/[0.08] shadow-md ring-1 ring-[#FF8A00]/25" 
             />
             <div className="flex flex-col leading-none">
-              <span className="font-black text-base text-white tracking-tight">VOLO</span>
-              <span className="text-[8px] font-bold uppercase tracking-widest text-[#FF8A00] font-mono mt-0.5">Control Tower</span>
+              <span className="font-black text-sm sm:text-base text-white tracking-tight">VOLO</span>
+              <span className="text-[8px] font-bold uppercase tracking-widest text-[#FF8A00] font-mono mt-0.5 hidden sm:block">Control Tower</span>
             </div>
           </Link>
         </div>
@@ -218,13 +218,13 @@ export default function AdminTopbar({
         </div>
 
         {/* Right side operational widgets */}
-        <div className="flex items-center gap-3.5">
+        <div className="flex items-center gap-1.5 sm:gap-3.5">
           
           {/* Quick Search Button for Mobile */}
           <button
             type="button"
             onClick={() => setShowSearchModal(true)}
-            className="md:hidden p-2.5 bg-[#0A0F1E] border border-[#1F2937] rounded-xl text-slate-400 hover:text-[#FF8A00] cursor-pointer"
+            className="md:hidden p-2 bg-[#0A0F1E] border border-[#1F2937] rounded-xl text-slate-400 hover:text-[#FF8A00] cursor-pointer"
             title="Search"
           >
             <Search className="h-4.5 w-4.5" />
@@ -235,7 +235,7 @@ export default function AdminTopbar({
             <button
               type="button"
               onClick={() => setShowQuickActions(!showQuickActions)}
-              className="flex items-center gap-1.5 px-3.5 py-2 bg-[#FF8A00] hover:bg-[#FF9F2E] text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-lg shadow-orange-950/20 active:scale-95 duration-150"
+              className="flex items-center gap-1.5 px-3 py-2 sm:px-3.5 sm:py-2 bg-[#FF8A00] hover:bg-[#FF9F2E] text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-lg shadow-orange-950/20 active:scale-95 duration-150"
             >
               <Plus className="h-4 w-4" />
               <span className="hidden lg:inline">Quick Action</span>
@@ -278,7 +278,7 @@ export default function AdminTopbar({
             <button
               type="button"
               onClick={() => setShowNotifications(!showNotifications)}
-              className={`p-2.5 rounded-xl border border-[#1F2937] bg-[#0A0F1E] text-slate-400 hover:text-[#FF8A00] transition-colors relative cursor-pointer active:scale-95 duration-150`}
+              className={`p-2 rounded-xl border border-[#1F2937] bg-[#0A0F1E] text-slate-400 hover:text-[#FF8A00] transition-colors relative cursor-pointer active:scale-95 duration-150`}
             >
               <Bell className="h-4.5 w-4.5" />
               {((pendingKyc || 0) + (pendingBookings || 0)) > 0 && (
@@ -334,7 +334,7 @@ export default function AdminTopbar({
           </div>
 
           {/* Admin User Profile Options Menu */}
-          <div className="relative border-l border-[#1F2937] pl-3.5" ref={profileRef}>
+          <div className="relative sm:border-l sm:border-[#1F2937] sm:pl-3.5" ref={profileRef}>
             <button
               type="button"
               onClick={() => setShowProfileMenu(!showProfileMenu)}

@@ -22,38 +22,62 @@ export async function POST(
       return NextResponse.json({ error: 'Booking not found.' }, { status: 404 });
     }
 
-    // 2. Validate worker owns this assigned job
-    if (booking.worker_id !== workerId) {
-      return NextResponse.json({ error: 'Access denied.' }, { status: 403 });
+    // 2. Validate worker owns this assigned job OR is in the broadcast group
+    if (booking.status === 'WORKER_ASSIGNED') {
+      if (booking.worker_id !== workerId) {
+        return NextResponse.json({ error: 'Access denied.' }, { status: 403 });
+      }
+
+      // Revert manual assignment
+      const { error: bookingUpdateErr } = await supabaseAdmin
+        .from('bookings')
+        .update({
+          worker_id: null,
+          status: 'PENDING_ASSIGNMENT',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id);
+
+      if (bookingUpdateErr) throw bookingUpdateErr;
+
+      const { error: workerUpdateErr } = await supabaseAdmin
+        .from('workers')
+        .update({
+          status: 'ONLINE',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', workerId);
+
+      if (workerUpdateErr) throw workerUpdateErr;
+
+      // Add to rejections
+      const { rejectBooking } = await import('@/lib/assignment-engine');
+      await rejectBooking(id, workerId, 'MANUAL_DECLINED_BY_WORKER');
+
+      return NextResponse.json({ success: true, message: 'Job rejected.' });
     }
 
-    if (booking.status !== 'WORKER_ASSIGNED') {
-      return NextResponse.json({ error: 'Only assigned pending jobs can be rejected.' }, { status: 400 });
+    if (booking.status === 'PENDING_ASSIGNMENT') {
+      // Verify they are in the broadcast group
+      const { data: queue } = await supabaseAdmin
+        .from('assignment_queue')
+        .select('all_notified_workers')
+        .eq('booking_id', id)
+        .single();
+
+      const wasNotified = queue?.all_notified_workers?.includes(workerId);
+      if (!wasNotified) {
+        return NextResponse.json({ error: 'Access denied. Not in broadcast group.' }, { status: 403 });
+      }
+
+      // Add to rejections & advance group if all rejected
+      const { rejectBooking } = await import('@/lib/assignment-engine');
+      await rejectBooking(id, workerId, 'BROADCAST_DECLINED_BY_WORKER');
+
+      return NextResponse.json({ success: true, message: 'Broadcast offer declined.' });
     }
 
-    // 3. Reset booking fields and revert worker status to ONLINE
-    const { error: bookingUpdateErr } = await supabaseAdmin
-      .from('bookings')
-      .update({
-        worker_id: null,
-        status: 'PENDING_ASSIGNMENT',
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', id);
-
-    if (bookingUpdateErr) throw bookingUpdateErr;
-
-    const { error: workerUpdateErr } = await supabaseAdmin
-      .from('workers')
-      .update({
-        status: 'ONLINE',
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', workerId);
-
-    if (workerUpdateErr) throw workerUpdateErr;
-
-    return NextResponse.json({ success: true, message: 'Job rejected.' });
+    return NextResponse.json({ error: 'Only pending or assigned jobs can be rejected.' }, { status: 400 });
   } catch (error: any) {
     console.error('Error rejecting job:', error.message || error);
     return NextResponse.json(

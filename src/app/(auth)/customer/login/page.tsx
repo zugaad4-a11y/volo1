@@ -455,6 +455,9 @@ function CustomerLoginInner() {
                 className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 text-center tracking-[0.5em] font-mono text-lg rounded-lg px-3 py-2.5 outline-none transition-colors"
                 required
               />
+              <span className="block text-[10px] text-slate-500 text-center mt-1.5 leading-normal font-semibold">
+                ℹ️ Check your **SMS spam folder** if the code doesn't arrive in a few seconds.
+              </span>
             </div>
 
             <button
@@ -500,17 +503,44 @@ function CustomerLoginInner() {
 
         {step === 'PIN' && (
           <form onSubmit={handleVerifyPin} className="space-y-5">
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label className="text-xs text-slate-400 font-medium block text-center">Enter Secure PIN</label>
+              
+              {/* PIN length selector */}
+              <div className="flex justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => { setPinLength(4); setPin(''); }}
+                  className={`flex-1 max-w-[120px] py-2 rounded-xl text-xs font-bold border transition-all ${
+                    pinLength === 4
+                      ? 'bg-violet-600 border-violet-600 text-white shadow-md'
+                      : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-violet-500 hover:text-violet-400'
+                  }`}
+                >
+                  4 Digit PIN
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setPinLength(6); setPin(''); }}
+                  className={`flex-1 max-w-[120px] py-2 rounded-xl text-xs font-bold border transition-all ${
+                    pinLength === 6
+                      ? 'bg-violet-600 border-violet-600 text-white shadow-md'
+                      : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-violet-500 hover:text-violet-400'
+                  }`}
+                >
+                  6 Digit PIN
+                </button>
+              </div>
+
               <div className="relative flex justify-center py-2">
                 <input
                   ref={pinInputRef}
                   type="text"
                   pattern="\d*"
                   inputMode="numeric"
-                  maxLength={6}
+                  maxLength={pinLength}
                   value={pin}
-                  onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
+                  onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, pinLength))}
                   onFocus={() => setIsPinFocused(true)}
                   onBlur={() => setIsPinFocused(false)}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
@@ -518,7 +548,7 @@ function CustomerLoginInner() {
                   autoFocus
                 />
                 <div className="flex gap-3 justify-center">
-                  {Array.from({ length: 6 }).map((_, idx) => (
+                  {Array.from({ length: pinLength }).map((_, idx) => (
                     <div
                       key={idx}
                       className={`w-12 h-14 rounded-2xl border flex items-center justify-center text-2xl font-bold transition-all duration-200
@@ -539,7 +569,7 @@ function CustomerLoginInner() {
 
             <button
               type="submit"
-              disabled={loading || pin.length < 4}
+              disabled={loading || pin.length !== pinLength}
               className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 disabled:from-violet-600/50 disabled:to-indigo-600/50 text-white font-medium rounded-lg py-2.5 text-sm transition-all flex justify-center items-center gap-2 cursor-pointer shadow-lg"
             >
               {loading ? (

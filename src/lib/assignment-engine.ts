@@ -459,6 +459,59 @@ export async function rejectBooking(
       reason: reason || null
     }, { onConflict: 'booking_id,worker_id' });
 
+  // 1.5 Check if worker has rejected more than 5 requests (excluding JOB_TAKEN auto-rejections)
+  const { count: explicitRejectionsCount } = await supabaseAdmin
+    .from('worker_job_rejections')
+    .select('*', { count: 'exact', head: true })
+    .eq('worker_id', workerId)
+    .neq('reason', 'JOB_TAKEN');
+
+  if (explicitRejectionsCount !== null && explicitRejectionsCount > 5) {
+    // Check if worker is currently actively on job
+    const { data: worker } = await supabaseAdmin
+      .from('workers')
+      .select('status')
+      .eq('id', workerId)
+      .single();
+
+    if (worker && worker.status !== 'ON_JOB') {
+      console.log(`[Assignment Engine] Worker ${workerId} has explicitly rejected ${explicitRejectionsCount} orders. Automatically suspending account.`);
+      
+      // Suspend in users table
+      await supabaseAdmin
+        .from('users')
+        .update({ is_suspended: true, updated_at: new Date().toISOString() })
+        .eq('id', workerId);
+
+      // Suspend in workers table
+      await supabaseAdmin
+        .from('workers')
+        .update({ status: 'SUSPENDED', updated_at: new Date().toISOString() })
+        .eq('id', workerId);
+
+      // Notify worker
+      await dispatchNotification({
+        userId: workerId,
+        type: 'LOW_WALLET_BALANCE',
+        title: 'Account Suspended',
+        body: 'Your account is suspended due to excessive booking rejections. Contact Super Admin to release.'
+      }).catch(err => console.error('Failed to notify worker of suspension:', err));
+
+      // Audit Log
+      await logAuditAction({
+        admin_id: SYSTEM_ADMIN_ID,
+        action: AuditAction.WORKER_SUSPENDED,
+        target_type: 'worker',
+        target_id: workerId,
+        metadata: {
+          worker_id: workerId,
+          reason: 'AUTO_SUSPEND_EXCESSIVE_REJECTIONS',
+          rejection_count: explicitRejectionsCount
+        }
+      });
+    }
+  }
+
   // 2. Fetch active BROADCASTING queue
   const { data: queue } = await supabaseAdmin
     .from('assignment_queue')

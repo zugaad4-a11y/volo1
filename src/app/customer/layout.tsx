@@ -133,18 +133,18 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
       
       {/* ================= STICKY TOP NAVBAR ================= */}
       <header className="sticky top-0 z-40 bg-[#0F172A]/80 backdrop-blur-xl border-b border-white/[0.08] shadow-lg shadow-[#070B14]/40 select-none">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-2 sm:gap-4">
           
           {/* Left: Branding */}
-          <Link href="/customer/dashboard" className="flex items-center gap-3 shrink-0 hover:opacity-90 transition-opacity active:scale-95 duration-200">
+          <Link href="/customer/dashboard" className="flex items-center gap-2 sm:gap-3 shrink-0 hover:opacity-90 transition-opacity active:scale-95 duration-200">
             <img 
               src="/images/logo.jpeg" 
               alt="VOLO Logo" 
               className="h-10 w-10 rounded-xl object-contain border border-white/[0.08] shadow-md" 
             />
             <div className="flex flex-col">
-              <span className="font-display font-black text-lg tracking-tight text-white leading-none bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">VOLO</span>
-              <span className="text-[8px] font-bold uppercase text-[#FF7A00] tracking-widest mt-0.5 leading-none font-mono">Client Portal</span>
+              <span className="font-display font-black text-base sm:text-lg tracking-tight text-white leading-none bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">VOLO</span>
+              <span className="text-[8px] font-bold uppercase text-[#FF7A00] tracking-widest mt-0.5 leading-none font-mono hidden sm:block">Client Portal</span>
             </div>
           </Link>
 
@@ -162,15 +162,15 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
           </div>
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             
             {/* Wallet quick chip */}
             <Link
               href="/customer/wallet"
-              className="flex items-center gap-2 px-4 py-2 bg-orange-500/10 border border-[#FF7A00]/25 hover:border-[#FF7A00]/50 rounded-2xl text-orange-400 hover:text-orange-300 transition-all text-xs font-black cursor-pointer shadow-lg shadow-orange-500/5"
+              className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 bg-orange-500/10 border border-[#FF7A00]/25 hover:border-[#FF7A00]/50 rounded-2xl text-orange-400 hover:text-orange-300 transition-all text-xs font-black cursor-pointer shadow-lg shadow-orange-500/5"
             >
               <Wallet className="h-4 w-4 text-[#FF7A00]" />
-              <span className="font-mono text-orange-300">
+              <span className="font-mono text-orange-300 hidden sm:inline">
                 ₹{walletBalance.toFixed(2)}
               </span>
             </Link>
@@ -183,11 +183,11 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
                   setNotifOpen(!notifOpen);
                   setProfileMenuOpen(false);
                 }}
-                className="p-3 text-slate-400 hover:text-slate-200 hover:bg-white/[0.05] rounded-2xl transition-all relative cursor-pointer active:scale-95"
+                className="p-2 sm:p-3 text-slate-400 hover:text-slate-200 hover:bg-white/[0.05] rounded-2xl transition-all relative cursor-pointer active:scale-95"
               >
                 <Bell className="h-4.5 w-4.5" />
                 {notifications.some(n => !n.is_read) && (
-                  <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-[#FF7A00]" />
+                  <span className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 h-2 w-2 rounded-full bg-[#FF7A00]" />
                 )}
               </button>
 
@@ -229,7 +229,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
                   setProfileMenuOpen(!profileMenuOpen);
                   setNotifOpen(false);
                 }}
-                className="flex items-center gap-2 p-1.5 hover:bg-white/[0.05] border border-white/[0.06] rounded-2xl transition-all cursor-pointer active:scale-95"
+                className="flex items-center gap-1.5 p-1 sm:p-1.5 hover:bg-white/[0.05] border border-white/[0.06] rounded-2xl transition-all cursor-pointer active:scale-95"
               >
                 <div className="h-8 w-8 rounded-xl bg-orange-500/10 border border-[#FF7A00]/30 flex items-center justify-center text-xs font-black uppercase text-[#FF7A00]">
                   {user?.full_name?.charAt(0) || 'C'}

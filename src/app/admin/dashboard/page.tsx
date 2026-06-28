@@ -105,18 +105,18 @@ export default function AdminDashboardPage() {
           </div>
           
           {/* Quick Highlight Stats Row */}
-          <div className="flex flex-wrap justify-center md:justify-start gap-5 text-xs font-mono font-bold mt-2">
-            <div className="px-3 py-1.5 rounded-xl bg-[#0A0F1E] border border-[#1F2937]">
-              <span className="text-slate-500 uppercase text-[9px] block">Revenue Today</span>
-              <span className="text-white text-sm mt-0.5 block font-black font-display">₹{stats.revenue_today.toLocaleString()}</span>
+          <div className="grid grid-cols-3 gap-2 w-full max-w-md mx-auto md:mx-0 text-xs font-mono font-bold mt-2">
+            <div className="p-2 rounded-xl bg-[#0A0F1E] border border-[#1F2937] text-center">
+              <span className="text-slate-500 uppercase text-[8px] sm:text-[9px] block">Revenue</span>
+              <span className="text-white text-xs sm:text-sm mt-0.5 block font-black font-display">₹{stats.revenue_today.toLocaleString()}</span>
             </div>
-            <div className="px-3 py-1.5 rounded-xl bg-[#0A0F1E] border border-[#1F2937]">
-              <span className="text-slate-500 uppercase text-[9px] block">Active Partners</span>
-              <span className="text-[#22C55E] text-sm mt-0.5 block font-black font-display">{stats.active_workers} Online</span>
+            <div className="p-2 rounded-xl bg-[#0A0F1E] border border-[#1F2937] text-center">
+              <span className="text-slate-500 uppercase text-[8px] sm:text-[9px] block">Partners</span>
+              <span className="text-[#22C55E] text-xs sm:text-sm mt-0.5 block font-black font-display">{stats.active_workers} Online</span>
             </div>
-            <div className="px-3 py-1.5 rounded-xl bg-[#0A0F1E] border border-[#1F2937]">
-              <span className="text-slate-500 uppercase text-[9px] block">Today's Bookings</span>
-              <span className="text-[#FF8A00] text-sm mt-0.5 block font-black font-display">{stats.todays_bookings} Orders</span>
+            <div className="p-2 rounded-xl bg-[#0A0F1E] border border-[#1F2937] text-center">
+              <span className="text-slate-500 uppercase text-[8px] sm:text-[9px] block">Bookings</span>
+              <span className="text-[#FF8A00] text-xs sm:text-sm mt-0.5 block font-black font-display">{stats.todays_bookings} Orders</span>
             </div>
           </div>
         </div>

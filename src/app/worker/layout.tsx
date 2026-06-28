@@ -249,24 +249,24 @@ export default function WorkerLayout({ children }: { children: React.ReactNode }
   const unreadCount = notifications.length;
 
   return (
-    <div className="min-h-screen bg-[#070B14] text-slate-100 font-sans antialiased flex flex-col selection:bg-orange-500/30 selection:text-white">
+    <div className="min-h-screen bg-[#070B14] text-slate-100 font-sans antialiased flex flex-col selection:bg-orange-500/30 selection:text-white overflow-x-hidden">
       
       {/* Premium Desktop Top Navigation */}
       <header className="sticky top-0 z-40 bg-[#0F172A]/80 backdrop-blur-xl border-b border-white/[0.08] shadow-lg shadow-[#070B14]/40 transition-all select-none">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-2 sm:gap-4">
           
           {/* Left: Brand Logo */}
-          <Link href="/worker/dashboard" className="flex items-center gap-3 group shrink-0 transition-transform active:scale-95">
+          <Link href="/worker/dashboard" className="flex items-center gap-2 sm:gap-3 group shrink-0 transition-transform active:scale-95">
             <img 
               src="/images/logo.jpeg" 
               alt="VOLO Logo" 
               className="h-10 w-10 rounded-xl object-contain border border-white/[0.08] shadow-md group-hover:scale-105 transition-transform duration-300" 
             />
             <div className="flex flex-col">
-              <span className="font-display font-black text-base leading-none tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-350 bg-clip-text text-transparent">
+              <span className="font-display font-black text-sm sm:text-base leading-none tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-350 bg-clip-text text-transparent">
                 VOLO WORKER
               </span>
-              <span className="text-[9px] font-bold text-[#FF7A00] tracking-widest uppercase mt-0.5 font-mono">
+              <span className="text-[8px] sm:text-[9px] font-bold text-[#FF7A00] tracking-widest uppercase mt-0.5 font-mono">
                 Field Partner
               </span>
             </div>
@@ -289,17 +289,17 @@ export default function WorkerLayout({ children }: { children: React.ReactNode }
           </div>
 
           {/* Right: Notifications, Wallet, Profile Actions */}
-          <div className="flex items-center gap-4 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             
             {/* Wallet Quick Widget */}
             <Link 
               href="/worker/settlements" 
-              className="flex items-center gap-2 px-3.5 py-2 bg-[#0F172A] border border-white/[0.08] hover:border-[#FF7A00]/40 rounded-2xl shadow-md transition-all hover:-translate-y-0.5 duration-200 active:scale-95 group"
+              className="flex items-center gap-2 p-2 sm:px-3.5 sm:py-2 bg-[#0F172A] border border-white/[0.08] hover:border-[#FF7A00]/40 rounded-2xl shadow-md transition-all hover:-translate-y-0.5 duration-200 active:scale-95 group"
             >
               <div className="h-7 w-7 rounded-xl bg-orange-500/10 flex items-center justify-center group-hover:bg-[#FF7A00]/20 transition-colors">
                 <Wallet className="h-4 w-4 text-[#FF7A00]" />
               </div>
-              <div className="flex flex-col text-right">
+              <div className="hidden sm:flex flex-col text-right">
                 <span className="text-[8px] font-black uppercase text-slate-500 tracking-wider">Earnings</span>
                 <span className="text-xs font-extrabold text-white group-hover:text-[#FF7A00] transition-colors">₹{walletBalance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
@@ -370,7 +370,7 @@ export default function WorkerLayout({ children }: { children: React.ReactNode }
               <button
                 type="button"
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                className={`flex items-center gap-2.5 pl-2.5 pr-3.5 py-1.5 rounded-2xl border transition-all ${
+                className={`flex items-center gap-1.5 sm:gap-2.5 p-1 sm:pl-2.5 sm:pr-3.5 sm:py-1.5 rounded-2xl border transition-all ${
                   profileDropdownOpen 
                     ? 'bg-[#FF7A00]/10 border-[#FF7A00]/30 text-white' 
                     : 'bg-[#0F172A] border-white/[0.08] text-slate-350 hover:text-white hover:border-white/[0.15]'
@@ -389,7 +389,7 @@ export default function WorkerLayout({ children }: { children: React.ReactNode }
                     ) : 'PENDING'}
                   </span>
                 </div>
-                <ChevronDown className={`h-3 w-3 text-slate-500 transition-transform ${profileDropdownOpen ? 'rotate-180 text-[#FF7A00]' : ''}`} />
+                <ChevronDown className={`hidden sm:block h-3 w-3 text-slate-500 transition-transform ${profileDropdownOpen ? 'rotate-180 text-[#FF7A00]' : ''}`} />
               </button>
 
               {/* Profile Dropdown Menu */}
@@ -505,7 +505,7 @@ export default function WorkerLayout({ children }: { children: React.ReactNode }
       </header>
 
       {/* Main Responsive Grid Container */}
-      <main className="flex-1 w-full bg-[#070B14] flex flex-col justify-start relative select-none">
+      <main className="flex-1 w-full bg-[#070B14] flex flex-col justify-start relative select-none overflow-hidden">
         {/* Background glow effects */}
         <div className="absolute top-0 left-1/4 h-[400px] w-[500px] bg-[#FF7A00]/5 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/4 h-[400px] w-[500px] bg-[#0EA5E9]/5 blur-[120px] rounded-full pointer-events-none" />
